@@ -1,0 +1,31 @@
+{
+    "name": "methorz/markme",
+    "description": "MethorZ - Markdown Parser",
+    "type": "library",
+    "homepage": "https://methorz.io",
+    "license": "proprietary",
+    "keywords": [
+        "methorz",
+        "markdown",
+        "parser"
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "^8.3"
+    },
+    "require-dev": {
+        "roave/security-advisories": "dev-latest"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "MethorZ\\FileSystem\\": "src/"
+        }
+    }
+}
