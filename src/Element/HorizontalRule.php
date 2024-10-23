@@ -13,13 +13,23 @@ namespace MethorZ\MarkMe\Element;
  */
 class HorizontalRule implements ElementInterface
 {
-    public const string REGEX = '/^---$/';
+    private const string REGEX = '/^---$/';
 
     /**
-     * Renders the markdown element as html
+     * Checks if the line matches the element and returns an instance of the element or false
      */
-    public function html(): string
+    public static function tryCreate(string $markdown): bool|self
     {
-        return '<hr>';
+        return preg_match(self::REGEX, $markdown)
+            ? new self()
+            : false;
+    }
+
+    /**
+     * Extracts the components of the element
+     */
+    public function extractComponents(): array
+    {
+        return [];
     }
 }

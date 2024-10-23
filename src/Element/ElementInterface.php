@@ -14,7 +14,9 @@ namespace MethorZ\MarkMe\Element;
 interface ElementInterface
 {
     /**
-     * Renders the markdown element as html
+     * Extracts the components from the element into an associative array that can be passed to the renderer
+     *
+     * @return array<string,string|int|bool|float|\MethorZ\MarkMe\Element\ElementInterface>
      */
-    public function html(): string;
+    public function extractComponents(): array;
 }

@@ -16,27 +16,39 @@ class Paragraph implements ElementInterface
     public const string REGEX = '/^\s*$/';
 
     /**
-     * Constructor
+     * List of lines inside the paragraph
+     *
+     * @var array<\MethorZ\MarkMe\Element\Text>
      */
-    public function __construct(
-        private readonly string $text,
-    ) {
+    private array $lines = [];
+
+    /**
+     * Returns the paragraph text
+     *
+     * @return array<\MethorZ\MarkMe\Element\Text>
+     */
+    public function getLines(): array
+    {
+        return $this->lines;
     }
 
     /**
-     * Returns the heading text
+     * Adds a line to the paragraph
      */
-    public function getText(): string
+    public function addLine(Text $line): void
     {
-        return $this->text;
+        $this->lines[] = $line;
     }
 
-
     /**
-     * Renders the markdown element as html
+     * Extracts the components of the element
+     *
+     * @return array<string,string|int|bool|float|\MethorZ\MarkMe\Element\ElementInterface>
      */
-    public function html(): string
+    public function extractComponents(): array
     {
-        return "<p>{$this->text}</p>";
+        return [
+            'lines' => $this->getLines(),
+        ];
     }
 }

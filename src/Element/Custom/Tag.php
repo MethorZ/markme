@@ -2,48 +2,41 @@
 
 declare(strict_types = 1);
 
-namespace MethorZ\MarkMe\Element;
+namespace MethorZ\MarkMe\Element\Custom;
 
 use MethorZ\MarkMe\Attribute\Attribute;
 use MethorZ\MarkMe\Attribute\AttributeAwareInterface;
 use MethorZ\MarkMe\Attribute\AttributeAwareTrait;
+use MethorZ\MarkMe\Element\ElementInterface;
+use MethorZ\MarkMe\Element\Text;
 
 /**
- * Heading element
+ * Tag element
  *
- * @package MethorZ\MarkMe\Element
+ * @package MethorZ\MarkMe\Element\Custom
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */
-class Heading implements ElementInterface, AttributeAwareInterface
+class Tag implements ElementInterface, AttributeAwareInterface
 {
     use AttributeAwareTrait;
 
-    private const string REGEX = '/^(#{1,6})\s+(.*?)(?:\s+\{\s*(.*?)\s*\})?$/';
+    public const string REGEX = '/(#[a-zA-Z0-9]*[a-zA-Z][a-zA-Z0-9]*)(\{[^}]*\})?(?=\s|<br\s*\/?>|$)/';
 
     /**
      * Constructor
      */
     public function __construct(
-        private readonly Text $text,
-        private readonly int $level
+        private readonly Text $tag
     ) {
     }
 
     /**
-     * Returns the heading text
+     * Returns the tag
      */
-    public function getText(): Text
+    public function getTag(): Text
     {
-        return $this->text;
-    }
-
-    /**
-     * Returns the heading level 1-6
-     */
-    public function getLevel(): int
-    {
-        return $this->level;
+        return $this->tag;
     }
 
     /**
@@ -55,8 +48,7 @@ class Heading implements ElementInterface, AttributeAwareInterface
     {
         return [
             'attributes' => $this->getAttributes(),
-            'level' => $this->level,
-            'text' => $this->text->getText(),
+            'text' => $this->tag->getText(),
         ];
     }
 
@@ -67,23 +59,27 @@ class Heading implements ElementInterface, AttributeAwareInterface
     {
         $result = false;
 
-        // Parse the heading element
+        // Parse the comment element
         if (preg_match(self::REGEX, $markdown, $matches)) {
+            // Remove the leading # inside of the matches[1]
+            $matches[1] = substr($matches[1], 1);
 
             $result = new self(
-                new Text(trim($matches[2])),
-                strlen($matches[1])
+                new Text($matches[1])
             );
 
             // Remove whitespaces inside the style string
-            if (isset($matches[3])) {
-                $matches[3] = preg_replace_callback('/style="([^"]*)"/', static function ($matches) {
+            if (isset($matches[2])) {
+                $matches[2] = preg_replace_callback('/style="([^"]*)"/', static function ($matches) {
                     return 'style="' . preg_replace('/\s+/', '', $matches[1]) . '"';
-                }, $matches[3]);
+                }, $matches[2]);
             }
 
-            foreach (explode(' ', $matches[3] ?? '') as $attributeString) {
-                $result->addAttribute(new Attribute($attributeString));
+            if (!empty($matches[2])) {
+                $matches[2] = trim($matches[2], '{}');
+                foreach (explode(' ', $matches[2] ?? '') as $attributeString) {
+                    $result->addAttribute(new Attribute($attributeString));
+                }
             }
         }
 

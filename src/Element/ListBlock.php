@@ -13,8 +13,6 @@ namespace MethorZ\MarkMe\Element;
  */
 class ListBlock implements ElementInterface
 {
-    public const REGEX = '/^(\s*)([*+-]|\d+\.)\s+((?:\[(.*?)\]\((.*?)\)|!\[(.*?)\]\((.*?)\)|.*?)+)$/';
-
     /**
      * List items
      *
@@ -26,22 +24,25 @@ class ListBlock implements ElementInterface
      * Constructor
      */
     public function __construct(
-        private readonly bool $isOrdered
+        private readonly bool $isOrdered,
+        private readonly int $indentation
     ) {
     }
 
     /**
      * Add list item
      */
-    public function addItem(ListItem|ListBlock $item): void
+    public function addItem(ListItem|self $item): void
     {
         $this->items[] = $item;
     }
 
     /**
-     * Returns the heading text
+     * Returns the list items
+     *
+     * @return array<\MethorZ\MarkMe\Element\ListItem|\MethorZ\MarkMe\Element\ListBlock>
      */
-    public function getItems(): string
+    public function getItems(): array
     {
         return $this->items;
     }
@@ -63,18 +64,16 @@ class ListBlock implements ElementInterface
     }
 
     /**
-     * Renders the markdown element as html
+     * Extracts the components of the element
+     *
+     * @return array<string,string|int|bool|float|\MethorZ\MarkMe\Element\ElementInterface>
      */
-    public function html(): string
+    public function extractComponents(): array
     {
-        $html = $this->isOrdered ? '<ol>' : '<ul>';
-
-        foreach ($this->items as $item) {
-            $html .= $item->html();
-        }
-
-        $html .= $this->isOrdered ? '</ol>' : '</ul>';
-
-        return $html;
+        return [
+            'indentation' => $this->indentation,
+            'isOrdered' => $this->isOrdered,
+            'items' => $this->items,
+        ];
     }
 }

@@ -11,29 +11,54 @@ namespace MethorZ\MarkMe\Element;
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */
-readonly class ListItem implements ElementInterface
+class ListItem implements ElementInterface
 {
+    public const string REGEX = '/^(\s*)([*+-]|\d+\.)\s+((?:\[(.*?)\]\((.*?)\)|!\[(.*?)\]\((.*?)\)|.*?)+)$/';
+
     /**
      * Constructor
      */
     public function __construct(
-        private readonly string $text
+        private readonly Text $content
     ) {
     }
 
     /**
      * Returns the heading text
      */
-    public function getText(): string
+    public function getContent(): Text
     {
-        return $this->text;
+        return $this->content;
     }
 
     /**
-     * Renders the markdown element as html
+     * Extracts the components of the element
+     *
+     * @return array<string,string|int|bool|float|\MethorZ\MarkMe\Element\ElementInterface>
      */
-    public function html(): string
+    public function extractComponents(): array
     {
-        return '<li>' . $this->text . '</li>';
+        return [
+            'content' => $this->content,
+        ];
+    }
+
+    /**
+     * Parses the markdown and returns the element if it matches
+     */
+    public static function tryCreate(string $markdown): bool|self
+    {
+        $result = false;
+
+        // Parse the list item element
+        if (preg_match(self::REGEX, $markdown, $matches)) {
+            $content = new Text(trim($matches[3]));
+
+            $result = new self(
+                $content
+            );
+        }
+
+        return $result;
     }
 }

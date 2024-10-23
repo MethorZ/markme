@@ -10,15 +10,15 @@ use Generator;
  * Rewindable generator
  *
  * @package MethorZ\MarkMe\Generator
- * @author Thorsten Merz <thorsten.merz@check24.de>
- * @copyright CHECK24 GmbH
+ * @author Thorsten Merz <methorz@spammerz.de>
+ * @copyright MethorZ
  */
 class RewindableGenerator
 {
     /**
      * Elements
      *
-     * @var array<mixed>
+     * @var array<int,mixed>
      */
     private array $elements = [];
     private Generator $generator;

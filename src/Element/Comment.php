@@ -5,39 +5,30 @@ declare(strict_types = 1);
 namespace MethorZ\MarkMe\Element;
 
 /**
- * Blockquote element
+ * HTML comment element
  *
  * @package MethorZ\MarkMe\Element
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */
-class BlockQuote implements ElementInterface
+class Comment implements ElementInterface
 {
-    private const string REGEX = '/^>\s+(.*)$/';
+    private const string REGEX = '/<!--\s*(.*?)\s*-->/';
 
     /**
-     * Quote lines
-     *
-     * @var array<\MethorZ\MarkMe\Element\Blockquote|\MethorZ\MarkMe\Element\Text>
+     * Constructor
      */
-    private array $lines = [];
-
-    /**
-     * Add quote lines whether it is a string or another nested BlockQuote
-     */
-    public function addLine(Text|self $line): void
-    {
-        $this->lines[] = $line;
+    public function __construct(
+        private readonly string $comment
+    ) {
     }
 
     /**
      * Returns the heading text
-     *
-     * @return array<string|\MethorZ\MarkMe\Element\Blockquote>
      */
-    public function getLines(): array
+    public function getComment(): string
     {
-        return $this->lines;
+        return $this->comment;
     }
 
     /**
@@ -48,7 +39,7 @@ class BlockQuote implements ElementInterface
     public function extractComponents(): array
     {
         return [
-            'lines' => $this->lines,
+            'comment' => $this->comment,
         ];
     }
 
@@ -59,10 +50,11 @@ class BlockQuote implements ElementInterface
     {
         $result = false;
 
-        // Parse potentially nested block quotes
+        // Parse the comment element
         if (preg_match(self::REGEX, $markdown, $matches)) {
-            $result = new self();
-            $result->addLine(new Text(trim($matches[1])));
+            $result = new self(
+                trim($matches[1])
+            );
         }
 
         return $result;

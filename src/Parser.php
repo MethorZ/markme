@@ -5,14 +5,15 @@ declare(strict_types = 1);
 namespace MethorZ\MarkMe;
 
 use Generator;
-use MethorZ\MarkMe\Element\Blockquote;
+use MethorZ\MarkMe\Element\BlockQuote;
+use MethorZ\MarkMe\Element\Comment;
 use MethorZ\MarkMe\Element\Heading;
 use MethorZ\MarkMe\Element\HorizontalRule;
 use MethorZ\MarkMe\Element\ListBlock;
 use MethorZ\MarkMe\Element\ListItem;
 use MethorZ\MarkMe\Element\Paragraph;
+use MethorZ\MarkMe\Element\Text;
 use MethorZ\MarkMe\Generator\RewindableGenerator;
-use Psr\Log\LoggerInterface;
 
 /**
  * Parser for markdown
@@ -31,64 +32,60 @@ class Parser
     private array $extractedLines = [];
 
     /**
-     * Constructor
-     */
-    public function __construct(
-        private readonly LoggerInterface $logger
-    ) {
-    }
-
-    /**
      * Parses the markdown text
+     *
+     * @return array<\MethorZ\MarkMe\Element\ElementInterface>
      */
-    public function parse(string $markdown): Markdown
+    public function parse(string $markdown): array
     {
         $this->extractLines($markdown);
 
         $rewindableGenerator = new RewindableGenerator($this->getLine());
 
-        $markdown = new Markdown();
+        $elements = [];
 
         while (($markdownLine = $rewindableGenerator->next()) !== null) {
 
             // Parse the heading element
-            if (preg_match(Heading::REGEX, $markdownLine, $matches)) {
-                $heading = new Heading(
-                    $this->parseInlineMarkdown(trim($matches[2])),
-                    strlen($matches[1])
-                );
+            $element = Heading::tryCreate($markdownLine);
 
-                $markdown->addElement($heading);
-
-                $this->logger->debug(
-                    sprintf('Found heading level %d: %s', $heading->getLevel(), $heading->getText())
-                );
+            if ($element !== false) {
+                $elements[] = $element;
 
                 continue;
             }
 
-            // Parse the blockquote element
-            if (preg_match(Blockquote::REGEX, $markdownLine, $matches)) {
-                $blockquote = new Blockquote(
-                    $this->parseInlineMarkdown(trim($matches[1]))
-                );
-                $markdown->addElement($blockquote);
+            // Parse the blockquote element while the next line is also a blockquote element
+            $element = BlockQuote::tryCreate($markdownLine);
 
-                $this->logger->debug(
-                    sprintf('Found blockquote: %s', $blockquote->getQuote())
-                );
+            if ($element !== false) {
+
+                while (
+                    ($markdownLine = $rewindableGenerator->next()) !== null
+                    && ($nextElement = BlockQuote::tryCreate($markdownLine)) !== false
+                ) {
+                    foreach ($nextElement->getLines() as $line) {
+                        $element->addLine(
+                            is_string($line) ? new Text($line) : $line
+                        );
+                    }
+                }
+
+                $elements[] = $element;
+
+                // Rewind the generator since the latest retrieved element was not a blockquote element anymore and should be parsed again
+                $rewindableGenerator->prev();
 
                 continue;
             }
 
             // Parse the list elements
-            if (preg_match(ListBlock::REGEX, $markdownLine, $matches)) {
+            if (preg_match(ListItem::REGEX, $markdownLine, $matches)) {
 
                 // Initialize a stack to keep track of list blocks and their indentation levels
                 $listStack = [];
 
                 do {
-
                     $indent = strlen($matches[1]);
                     $marker = $matches[2];
                     $text = trim($matches[3]);
@@ -98,24 +95,16 @@ class Parser
 
                     // Create a new list item
                     $listItem = new ListItem(
-                        $this->parseInlineMarkdown($text)
+                        new Text($text)
                     );
 
                     // Check if we need to create a new list block or add to the existing one
                     if (empty($listStack) || $listStack[count($listStack) - 1]['indent'] < $indent) {
                         // Create a new list block
-                        $listBlock = new ListBlock($isOrdered);
-
-                        $this->logger->debug(
-                            sprintf('Creating new %s list block with indent %d', $isOrdered ? 'ordered' : 'unordered', $indent)
-                        );
+                        $listBlock = new ListBlock($isOrdered, $indent);
 
                         $listBlock->addItem($listItem);
                         $listStack[] = ['block' => $listBlock, 'indent' => $indent];
-
-                        $this->logger->debug(
-                            sprintf('Found %s list item with indent %d: %s', $isOrdered ? 'ordered' : 'unordered', $indent, $text)
-                        );
                     } else {
                         // Add the item to the existing list block
                         while (!empty($listStack) && $listStack[count($listStack) - 1]['indent'] > $indent) {
@@ -125,16 +114,12 @@ class Parser
                         $listStack[count($listStack) - 1]['block']->addItem($listItem);
                     }
 
-                    $this->logger->debug(
-                        sprintf('Found %s list item with indent %d: %s', $isOrdered ? 'ordered' : 'unordered', $indent, $text)
-                    );
-
                 // While each new line is a list item
-                } while (($markdownLine = $rewindableGenerator->next()) !== null && preg_match(ListBlock::REGEX, $markdownLine, $matches)); // phpcs:ignore
+                } while (($markdownLine = $rewindableGenerator->next()) !== null && preg_match(ListItem::REGEX, $markdownLine, $matches)); // phpcs:ignore
 
                 // Add the list blocks to the markdown object
                 foreach ($listStack as $listEntry) {
-                    $markdown->addElement($listEntry['block']);
+                    $elements[] = $listEntry['block'];
                 }
 
                 // Rewind the generator since the latest retrieved element was not a list element anymore and should be parsed again
@@ -144,19 +129,38 @@ class Parser
             }
 
             // Parse the horizontal rule
-            if (preg_match(HorizontalRule::REGEX, $markdownLine)) {
-                $markdown->addElement(new HorizontalRule());
+            $element = HorizontalRule::tryCreate($markdownLine);
 
-                $this->logger->debug('Found horizontal rule');
+            if ($element !== false) {
+                $elements[] = $element;
 
                 continue;
             }
 
-            // Add the line as a paragraph
-            $markdown->addElement(new Paragraph($markdownLine));
+            // Parse html comments
+            $element = Comment::tryCreate($markdownLine);
+
+            if ($element !== false) {
+                $elements[] = $element;
+
+                continue;
+            }
+
+            if (!empty($markdownLine)) {
+                // Create a new paragraph element
+                $paragraph = new Paragraph();
+
+                do {
+                    // Keep adding lines to the paragraph element until an empty line is found
+                    $paragraph->addLine(new Text($markdownLine));
+                } while (($markdownLine = $rewindableGenerator->next()) !== null && !empty($markdownLine));
+
+                // Parse the paragraph element while not getting an empty line
+                $elements[] = $paragraph;
+            }
         }
 
-        return $markdown;
+        return $elements;
     }
 
     /**
@@ -183,40 +187,5 @@ class Parser
         foreach ($this->extractedLines as $line) {
             yield $line;
         }
-    }
-
-    /**
-     * Parses the inline elements
-     */
-    private function parseInlineMarkdown(string $line): string
-    {
-        // Parse link
-        $line = preg_replace('/\[(.*?)\]\((.*?)\)/', '<a href="$2">$1</a>', $line);
-
-        // Parse images
-        $line = preg_replace('/!\[(.*?)\]\((.*?)\)/', '<img src="$2" alt="$1">', $line);
-
-        // Parse bold text
-        $line = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $line);
-
-        // Parse italic text
-        $line = preg_replace('/\*(.*?)\*/', '<em>$1</em>', $line);
-
-        // Parse strikethrough text
-        $line = preg_replace('/~~(.*?)~~/', '<del>$1</del>', $line);
-
-        // Parse inline code
-        $line = preg_replace('/`(.*?)`/', '<code>$1</code>', $line);
-
-        // Parse subscripts
-        $line = preg_replace('/~(.*?)~/', '<sub>$1</sub>', $line);
-
-        // Parse superscripts
-        $line = preg_replace('/\^(.*?)\^/', '<sup>$1</sup>', $line);
-
-        // Parse underlined text
-        $line = preg_replace('/__(.*?)__/', '<u>$1</u>', $line);
-
-        return $line;
     }
 }
