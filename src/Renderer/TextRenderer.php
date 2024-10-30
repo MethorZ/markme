@@ -6,12 +6,12 @@ namespace MethorZ\MarkMe\Renderer;
 
 use MethorZ\MarkMe\Element\Custom\Tag;
 use MethorZ\MarkMe\Element\ElementInterface;
-use MethorZ\MarkMe\Element\Image;
+use MethorZ\MarkMe\Element\Inline\Image;
 
 /**
  * Default heading renderer
  *
- * @package MethorZ\MarkMe\Element
+ * @package MethorZ\MarkMe\Renderer
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */
@@ -21,9 +21,8 @@ readonly class TextRenderer implements RendererInterface
      * Constructor
      */
     public function __construct(
-        private readonly ImageRenderer $imageRenderer,
-        #private readonly LinkRenderer $linkRenderer,
-        private readonly TagRenderer $tagRenderer
+        private RendererInterface $imageRenderer,
+        private RendererInterface $tagRenderer
     ) {
     }
 
@@ -44,9 +43,8 @@ readonly class TextRenderer implements RendererInterface
         $text = $this->renderUnderlined($text);
         $text = $this->renderImage($text);
         $text = $this->renderLink($text);
-        $text = $this->renderTag($text);
 
-        return $text;
+        return $this->renderTag($text);
     }
 
     /**

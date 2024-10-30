@@ -10,7 +10,7 @@ use MethorZ\MarkMe\Element\ElementInterface;
 /**
  * Default tag renderer
  *
- * @package MethorZ\MarkMe\Element
+ * @package MethorZ\MarkMe\Renderer
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */

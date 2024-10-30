@@ -10,7 +10,7 @@ use MethorZ\MarkMe\Element\ElementInterface;
 /**
  * Default heading renderer
  *
- * @package MethorZ\MarkMe\Element
+ * @package MethorZ\MarkMe\Renderer
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */
@@ -36,6 +36,6 @@ class HeadingRenderer implements RendererInterface
             $html = str_replace('{{ ' . $placeholder . ' }}', (string)$value, $html);
         }
 
-        return $html;
+        return $html . PHP_EOL;
     }
 }

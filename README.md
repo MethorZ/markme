@@ -27,7 +27,7 @@ require 'vendor/autoload.php';
 use MethorZ\MarkMe\Markdown;
 use MethorZ\MarkMe\Renderer\ParagraphRenderer;
 use MethorZ\MarkMe\Element\Paragraph;
-use MethorZ\MarkMe\Element\Text;
+use MethorZ\MarkMe\Element\Inline\Text;
 
 $markdown = new Markdown();
 $markdown->setRenderer(Paragraph::class, new ParagraphRenderer());

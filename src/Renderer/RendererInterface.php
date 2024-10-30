@@ -9,7 +9,7 @@ use MethorZ\MarkMe\Element\ElementInterface;
 /**
  * Interface defining a renderer for an element
  *
- * @package MethorZ\MarkMe\Element
+ * @package MethorZ\MarkMe\Renderer
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */

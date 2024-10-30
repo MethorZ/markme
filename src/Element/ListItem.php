@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace MethorZ\MarkMe\Element;
 
+use MethorZ\MarkMe\Element\Inline\Text;
+
 /**
  * List Item element
  *
@@ -11,7 +13,7 @@ namespace MethorZ\MarkMe\Element;
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */
-class ListItem implements ElementInterface
+class ListItem extends AbstractElement
 {
     public const string REGEX = '/^(\s*)([*+-]|\d+\.)\s+((?:\[(.*?)\]\((.*?)\)|!\[(.*?)\]\((.*?)\)|.*?)+)$/';
 

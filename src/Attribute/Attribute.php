@@ -40,8 +40,33 @@ class Attribute implements AttributeInterface
         } elseif (str_starts_with($value, 'style=')) {
             $this->type = self::TYPE_STYLE;
 
-            // Extract the styles and remove the style= part and closing quote while removing whitespace characters
-            $this->value = str_replace(' ', '', substr($value, 7, -1));
+            /*
+             * From inner most to outer most operations:
+             * - Remove the style= part including the closing quote
+             * - Remove trailing semi-colon
+             * - Remove all whitespace characters
+             * - Split the string by semicolon to obtain key value pairs
+             * - Glue all elements back together using a semicolon and a whitespace to apply a generic formatting
+             * - Append a trailing semi-colon at the end to conclude the last style setting
+             */
+            $this->value = implode(
+                '; ',
+                explode(
+                    ';',
+                    str_replace(
+                        ' ',
+                        '',
+                        trim(
+                            substr(
+                                $value,
+                                7,
+                                -1
+                            ),
+                            ';'
+                        )
+                    )
+                )
+            ) . ';';
 
         // Other attributes with key and optional value
         } else {
@@ -79,6 +104,14 @@ class Attribute implements AttributeInterface
     public function isKeyValue(): bool
     {
         return $this->type === self::TYPE_KEY_VALUE;
+    }
+
+    /**
+     * Returns the type of the attribute
+     */
+    public function getType(): string
+    {
+        return $this->type;
     }
 
     /**

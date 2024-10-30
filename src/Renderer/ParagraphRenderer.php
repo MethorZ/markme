@@ -5,12 +5,12 @@ declare(strict_types = 1);
 namespace MethorZ\MarkMe\Renderer;
 
 use MethorZ\MarkMe\Element\ElementInterface;
-use MethorZ\MarkMe\Element\Text;
+use MethorZ\MarkMe\Element\Inline\Text;
 
 /**
  * Default paragraph renderer
  *
- * @package MethorZ\MarkMe\Element
+ * @package MethorZ\MarkMe\Renderer
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */
@@ -18,6 +18,9 @@ class ParagraphRenderer implements RendererInterface
 {
     private const string ELEMENT_HTML = '<p>{{ lines }}</p>';
 
+    /**
+     * Constructor
+     */
     public function __construct(
         private readonly RendererInterface $textRenderer
     ) {

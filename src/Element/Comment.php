@@ -11,9 +11,9 @@ namespace MethorZ\MarkMe\Element;
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */
-class Comment implements ElementInterface
+class Comment extends AbstractElement
 {
-    private const string REGEX = '/<!--\s*(.*?)\s*-->/';
+    private const string REGEX = '/<!--\s*(.*?)\s*-->/s';
 
     /**
      * Constructor

@@ -11,9 +11,19 @@ namespace MethorZ\MarkMe\Element;
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */
-class HorizontalRule implements ElementInterface
+class HorizontalRule extends AbstractElement
 {
-    private const string REGEX = '/^---$/';
+    private const string REGEX = '/^(\*\*\*+|___+|---+)$/';
+
+    /**
+     * Extracts the components of the element
+     *
+     * @return array<null,null>
+     */
+    public function extractComponents(): array
+    {
+        return [];
+    }
 
     /**
      * Checks if the line matches the element and returns an instance of the element or false
@@ -23,13 +33,5 @@ class HorizontalRule implements ElementInterface
         return preg_match(self::REGEX, $markdown)
             ? new self()
             : false;
-    }
-
-    /**
-     * Extracts the components of the element
-     */
-    public function extractComponents(): array
-    {
-        return [];
     }
 }

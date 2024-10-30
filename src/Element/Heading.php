@@ -7,6 +7,7 @@ namespace MethorZ\MarkMe\Element;
 use MethorZ\MarkMe\Attribute\Attribute;
 use MethorZ\MarkMe\Attribute\AttributeAwareInterface;
 use MethorZ\MarkMe\Attribute\AttributeAwareTrait;
+use MethorZ\MarkMe\Element\Inline\Text;
 
 /**
  * Heading element
@@ -15,7 +16,7 @@ use MethorZ\MarkMe\Attribute\AttributeAwareTrait;
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */
-class Heading implements ElementInterface, AttributeAwareInterface
+class Heading extends AbstractElement implements AttributeAwareInterface
 {
     use AttributeAwareTrait;
 
@@ -80,10 +81,10 @@ class Heading implements ElementInterface, AttributeAwareInterface
                 $matches[3] = preg_replace_callback('/style="([^"]*)"/', static function ($matches) {
                     return 'style="' . preg_replace('/\s+/', '', $matches[1]) . '"';
                 }, $matches[3]);
-            }
 
-            foreach (explode(' ', $matches[3] ?? '') as $attributeString) {
-                $result->addAttribute(new Attribute($attributeString));
+                foreach (explode(' ', $matches[3]) as $attributeString) {
+                    $result->addAttribute(new Attribute($attributeString));
+                }
             }
         }
 

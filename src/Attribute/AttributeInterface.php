@@ -34,6 +34,11 @@ interface AttributeInterface
     public function isKeyValue(): bool;
 
     /**
+     * Returns the type of the attribute
+     */
+    public function getType(): string;
+
+    /**
      * Returns the value
      */
     public function getValue(): string;

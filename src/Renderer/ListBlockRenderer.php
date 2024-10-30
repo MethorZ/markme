@@ -11,17 +11,17 @@ use MethorZ\MarkMe\Element\ListItem;
 /**
  * Default list block renderer
  *
- * @package MethorZ\MarkMe\Element
+ * @package MethorZ\MarkMe\Renderer
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */
-class ListBlockRenderer implements RendererInterface
+readonly class ListBlockRenderer implements RendererInterface
 {
     /**
      * Constructor
      */
     public function __construct(
-        private readonly ListItemRenderer $listItemRenderer
+        private RendererInterface $listItemRenderer
     ) {
     }
 
@@ -31,21 +31,19 @@ class ListBlockRenderer implements RendererInterface
     public function render(ElementInterface $element): string
     {
         $html = $element->isOrdered()
-            ? '<ol>{{ items }}</ol>'
-            : '<ul>{{ items }}</ul>';
+            ? "<ol>{{ items }}\n</ol>"
+            : "<ul>{{ items }}\n</ul>";
 
         $items = '';
 
         foreach ($element->getItems() as $item) {
             if ($item instanceof ListItem) {
-                $items .= $this->listItemRenderer->render($item);
+                $items .= PHP_EOL . $this->listItemRenderer->render($item);
             } elseif ($item instanceof ListBlock) {
-                $items .= '<li>' . $this->render($item) . '</li>';
+                $items .= PHP_EOL . '<li>' . PHP_EOL . $this->render($item) . PHP_EOL . '</li>';
             }
         }
 
-        $html = str_replace('{{ items }}', $items, $html);
-
-        return $html;
+        return str_replace('{{ items }}', $items, $html) . PHP_EOL;
     }
 }

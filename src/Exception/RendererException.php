@@ -9,7 +9,7 @@ use Exception;
 /**
  * Exception for renderer errors
  *
- * @package MethorZ\MarkMe\Element
+ * @package MethorZ\MarkMe\Exception
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */

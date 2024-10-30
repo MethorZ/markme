@@ -64,4 +64,12 @@ class RewindableGenerator
 
         return null; // Start of generator
     }
+
+    /**
+     * Get the current element
+     */
+    public function current(): mixed
+    {
+        return $this->elements[$this->position];
+    }
 }

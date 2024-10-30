@@ -7,8 +7,8 @@ namespace MethorZ\MarkMe\Element\Custom;
 use MethorZ\MarkMe\Attribute\Attribute;
 use MethorZ\MarkMe\Attribute\AttributeAwareInterface;
 use MethorZ\MarkMe\Attribute\AttributeAwareTrait;
-use MethorZ\MarkMe\Element\ElementInterface;
-use MethorZ\MarkMe\Element\Text;
+use MethorZ\MarkMe\Element\AbstractElement;
+use MethorZ\MarkMe\Element\Inline\Text;
 
 /**
  * Tag element
@@ -17,7 +17,7 @@ use MethorZ\MarkMe\Element\Text;
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */
-class Tag implements ElementInterface, AttributeAwareInterface
+class Tag extends AbstractElement implements AttributeAwareInterface
 {
     use AttributeAwareTrait;
 
@@ -77,6 +77,7 @@ class Tag implements ElementInterface, AttributeAwareInterface
 
             if (!empty($matches[2])) {
                 $matches[2] = trim($matches[2], '{}');
+
                 foreach (explode(' ', $matches[2] ?? '') as $attributeString) {
                     $result->addAttribute(new Attribute($attributeString));
                 }

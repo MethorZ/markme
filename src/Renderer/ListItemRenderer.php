@@ -5,12 +5,12 @@ declare(strict_types = 1);
 namespace MethorZ\MarkMe\Renderer;
 
 use MethorZ\MarkMe\Element\ElementInterface;
-use MethorZ\MarkMe\Element\Text;
+use MethorZ\MarkMe\Element\Inline\Text;
 
 /**
  * Default list item renderer
  *
- * @package MethorZ\MarkMe\Element
+ * @package MethorZ\MarkMe\Renderer
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */
@@ -20,7 +20,7 @@ readonly class ListItemRenderer implements RendererInterface
      * Constructor
      */
     public function __construct(
-        private readonly TextRenderer $textRenderer
+        private RendererInterface $textRenderer
     ) {
     }
 
@@ -40,6 +40,6 @@ readonly class ListItemRenderer implements RendererInterface
             $html = str_replace('{{ ' . $placeholder . ' }}', is_int($value) ? (string)$value : $value ?? '', $html);
         }
 
-        return $html;
+        return $html . PHP_EOL;
     }
 }
