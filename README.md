@@ -30,6 +30,8 @@ use MethorZ\MarkMe\Element\Paragraph;
 use MethorZ\MarkMe\Element\Inline\Text;
 
 $markdown = new Markdown();
+
+// Optional: Set a custom renderer for the Paragraph element.
 $markdown->setRenderer(Paragraph::class, new ParagraphRenderer());
 
 $text = new Text('This is a paragraph.');
