@@ -1,19 +1,21 @@
-> This is an example of a blockquote.
-
-> This is an example of a multiline blockquote.
-> It consists of three lines of blockquote text.
-> This is the last line of the blockquote text.
-
-> This is an example of a multiline nested blockquote.
-> The first two lines are the first (top) level elements.
+> Level 1 quote first paragraph
 >
->> This is the second level of the nested blockquote.
->> Followed by this second line of nested blockquote on the second level.
+> Level 1 quote second paragraph
+>> Level 2 quote first line
+>>
+>> Level 2 quote new paragraph
+>>> Level 3 quote first paragraph
+>>>
+>>> Level 3 quote second paragraph
+>>> Still level 3 same paragraph
+>>
+>> Back to level 2 in a new paragraph
+>>> Going to level 3 again
+>>>
+>>> Another paragraph at level 3
+>>
+>> Back to level 2 once more
 >
->>> This is the third level of nested blockquote as a single line.
+> And finally back to level 1
 >
->> We are now adding a second independent second level blockquote.
->
->>> Additionally, nesting a third level blockquote.
->
-> Last but not least we are back to the first level blockquote now.
+> A final paragraph at level 1 to wrap things up

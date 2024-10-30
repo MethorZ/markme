@@ -11,6 +11,7 @@ use MethorZ\MarkMe\Element\Heading;
 use MethorZ\MarkMe\Element\HorizontalRule;
 use MethorZ\MarkMe\Element\ListBlock;
 use MethorZ\MarkMe\Element\ListItem;
+use MethorZ\MarkMe\Element\NewLine;
 use MethorZ\MarkMe\Element\Paragraph;
 use MethorZ\MarkMe\Exception\IdentificationException;
 use MethorZ\MarkMe\Metadata\FrontMatter;
@@ -70,9 +71,9 @@ class Identifier
     public const string TAG = Tag::class;
 
     /**
-     * Identifier for an empty line
+     * Identifier for an new (empty) line
      */
-    public const string EMPTY_LINE = 'empty_line';
+    public const string NEW_LINE = NewLine::class;
 
     /**
      * Identify the markdown element
@@ -82,8 +83,8 @@ class Identifier
      */
     public static function identify(string $markdownLine, bool $isFirstParsing = false): string
     {
-        if ($markdownLine === '') {
-            return self::EMPTY_LINE;
+        if (NewLine::tryCreate($markdownLine) !== false) {
+            return self::NEW_LINE;
         }
 
         if (BlockQuote::tryCreate($markdownLine) !== false) {

@@ -7,6 +7,7 @@ namespace MethorZ\MarkMeTest\Assets;
 use MethorZ\MarkMe\Attribute\Attribute;
 use MethorZ\MarkMe\Element\Custom\Tag;
 use MethorZ\MarkMe\Element\Inline\Text;
+use MethorZ\MarkMe\Element\NewLine;
 
 /**
  * Tests cases / expectations / elements provider for tags
@@ -69,14 +70,23 @@ class TagTestProvider
 
         return [
             new Tag(new Text('ThisIsATag')),
+            new NewLine(),
             new Tag(new Text('TagWithNumberAtEnd1')),
+            new NewLine(),
             new Tag(new Text('TagWith1NumberIn')),
+            new NewLine(),
             new Tag(new Text('1TagWithNumberAtStart')),
+            new NewLine(),
             $tagWithAttribute1,
+            new NewLine(),
             $tagWithAttribute2,
+            new NewLine(),
             $tagWithAttribute3,
+            new NewLine(),
             $tagWithAttribute4,
+            new NewLine(),
             $tagWithAttribute5,
+            new NewLine(),
             $tagWithMultipleAttributes,
         ];
     }

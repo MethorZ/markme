@@ -6,6 +6,7 @@ namespace MethorZ\MarkMeTest\Assets;
 
 use MethorZ\MarkMe\Element\BlockQuote;
 use MethorZ\MarkMe\Element\Inline\Text;
+use MethorZ\MarkMe\Element\Paragraph;
 
 /**
  * Tests cases / expectations / elements provider for blockquotes
@@ -23,68 +24,64 @@ class BlockQuoteTestProvider
      */
     public static function getElements(): array // phpcs:ignore
     {
-        /*
-         * Build this markdown:
-         *
-         * > This is an example of a blockquote.
-         */
-        $blockQuote1 = new BlockQuote();
-        $blockQuote1->addLine(new Text('This is an example of a blockquote.'));
+        $rootBlockQuote = new BlockQuote();
+        $paragraph1 = new Paragraph();
+        $paragraph1->addLine(new Text('Level 1 quote first paragraph'));
+        $rootBlockQuote->addLine($paragraph1);
 
-        /*
-         * Build this markdown:
-         *
-         * > This is an example of a multiline blockquote.
-         * > It consists of three lines of blockquote text.
-         * > This is the last line of the blockquote text.
-         */
-        $blockQuote2 = new BlockQuote();
-        $blockQuote2->addLine(new Text('This is an example of a multiline blockquote.'));
-        $blockQuote2->addLine(new Text('It consists of three lines of blockquote text.'));
-        $blockQuote2->addLine(new Text('This is the last line of the blockquote text.'));
+        $paragraph2 = new Paragraph();
+        $paragraph2->addLine(new Text('Level 1 quote second paragraph'));
+        $rootBlockQuote->addLine($paragraph2);
 
-        /*
-         * Build this markdown:
-         *
-         * > This is an example of a multiline nested blockquote.
-         * > The first two lines are the first (top) level elements.
-         * >> This is the second level of the nested blockquote.
-         * >> Followed by this second line of nested blockquote on the second level.
-         * >>> This is the third level of nested blockquote as a single line.
-         * >> We are now adding a second independent second level blockquote.
-         * >>> Additionally, nesting a third level blockquote.
-         * > Last but not least we are back to the first level blockquote now.
-         */
-        $blockQuote3 = new BlockQuote();
-        $blockQuote3->addLine(new Text('This is an example of a multiline nested blockquote.'));
-        $blockQuote3->addLine(new Text('The first two lines are the first (top) level elements.'));
+        $level2BlockQuote = new BlockQuote();
+        $rootBlockQuote->addLine($level2BlockQuote);
+        $paragraph3 = new Paragraph();
+        $paragraph3->addLine(new Text('Level 2 quote first line'));
+        $level2BlockQuote->addLine($paragraph3);
 
-        // Create the second level blockquote and add it directly to the first level blockquote
-        $secondLevelBlockquote1 = new BlockQuote();
-        $blockQuote3->addLine($secondLevelBlockquote1);
-        $secondLevelBlockquote1->addLine(new Text('This is the second level of the nested blockquote.'));
-        $secondLevelBlockquote1->addLine(new Text('Followed by this second line of nested blockquote on the second level.'));
+        $paragraph4 = new Paragraph();
+        $paragraph4->addLine(new Text('Level 2 quote new paragraph'));
+        $level2BlockQuote->addLine($paragraph4);
 
-        // Create the first third level blockquote and add it to the second level blockquote
-        $thirdLevelBlockquote1 = new BlockQuote();
-        $secondLevelBlockquote1->addLine($thirdLevelBlockquote1);
-        $thirdLevelBlockquote1->addLine(new Text('This is the third level of nested blockquote as a single line.'));
+        $level3BlockQuote = new BlockQuote();
+        $level2BlockQuote->addLine($level3BlockQuote);
+        $paragraph5 = new Paragraph();
+        $paragraph5->addLine(new Text('Level 3 quote first paragraph'));
+        $level3BlockQuote->addLine($paragraph5);
 
-        // Add the next second level line to the corresponding blockquote
-        $secondLevelBlockquote1->addLine(new Text('We are now adding a second independent second level blockquote.'));
+        $paragraph6 = new Paragraph();
+        $paragraph6->addLine(new Text('Level 3 quote second paragraph'));
+        $paragraph6->addLine(new Text('Still level 3 same paragraph'));
+        $level3BlockQuote->addLine($paragraph6);
 
-        // Create the second third level blockquote and add it to the second level blockquote
-        $thirdLevelBlockquote2 = new BlockQuote();
-        $secondLevelBlockquote1->addLine($thirdLevelBlockquote2);
-        $thirdLevelBlockquote2->addLine(new Text('Additionally, nesting a third level blockquote.'));
+        $paragraph7 = new Paragraph();
+        $paragraph7->addLine(new Text('Back to level 2 in a new paragraph'));
+        $level2BlockQuote->addLine($paragraph7);
 
-        // Add the last first level line to the corresponding blockquote
-        $blockQuote3->addLine(new Text('Last but not least we are back to the first level blockquote now.'));
+        $level3BlockQuote2 = new BlockQuote();
+        $level2BlockQuote->addLine($level3BlockQuote2);
+        $paragraph8 = new Paragraph();
+        $paragraph8->addLine(new Text('Going to level 3 again'));
+        $level3BlockQuote2->addLine($paragraph8);
+
+        $paragraph9 = new Paragraph();
+        $paragraph9->addLine(new Text('Another paragraph at level 3'));
+        $level3BlockQuote2->addLine($paragraph9);
+
+        $paragraph10 = new Paragraph();
+        $paragraph10->addLine(new Text('Back to level 2 once more'));
+        $level2BlockQuote->addLine($paragraph10);
+
+        $paragraph11 = new Paragraph();
+        $paragraph11->addLine(new Text('And finally back to level 1'));
+        $rootBlockQuote->addLine($paragraph11);
+
+        $paragraph12 = new Paragraph();
+        $paragraph12->addLine(new Text('A final paragraph at level 1 to wrap things up'));
+        $rootBlockQuote->addLine($paragraph12);
 
         return [
-            $blockQuote1,
-            $blockQuote2,
-            $blockQuote3,
+            $rootBlockQuote,
         ];
     }
 }

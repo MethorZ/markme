@@ -5,6 +5,8 @@ declare(strict_types = 1);
 namespace MethorZ\MarkMe\Renderer;
 
 use MethorZ\MarkMe\Element\ElementInterface;
+use MethorZ\MarkMe\Element\Indentation\IndentationAwareInterface;
+use MethorZ\MarkMe\Element\Indentation\IndentationAwareTrait;
 use MethorZ\MarkMe\Element\Inline\Text;
 
 /**
@@ -14,13 +16,15 @@ use MethorZ\MarkMe\Element\Inline\Text;
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */
-readonly class ListItemRenderer implements RendererInterface
+class ListItemRenderer implements RendererInterface, IndentationAwareInterface
 {
+    use IndentationAwareTrait;
+
     /**
      * Constructor
      */
     public function __construct(
-        private RendererInterface $textRenderer
+        private readonly RendererInterface $textRenderer
     ) {
     }
 
@@ -29,7 +33,7 @@ readonly class ListItemRenderer implements RendererInterface
      */
     public function render(ElementInterface $element): string
     {
-        $html = '<li>{{ content }}</li>';
+        $html = PHP_EOL . $this->indent() . '<li>{{ content }}';
 
         foreach ($element->extractComponents() as $placeholder => $value) {
 
@@ -40,6 +44,6 @@ readonly class ListItemRenderer implements RendererInterface
             $html = str_replace('{{ ' . $placeholder . ' }}', is_int($value) ? (string)$value : $value ?? '', $html);
         }
 
-        return $html . PHP_EOL;
+        return $html . '</li>';
     }
 }

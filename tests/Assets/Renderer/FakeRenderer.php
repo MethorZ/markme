@@ -11,8 +11,8 @@ use MethorZ\MarkMe\Renderer\RendererInterface;
  * Fake renderer for testing
  *
  * @package MethorZ\MarkMeTest\Assets\Renderer
- * @author Thorsten Merz <thorsten.merz@check24.de>
- * @copyright CHECK24 GmbH
+ * @author Thorsten Merz <methorz@spammerz.de>
+ * @copyright MethorZ
  */
 readonly class FakeRenderer implements RendererInterface
 {

@@ -4,8 +4,12 @@ declare(strict_types = 1);
 
 namespace MethorZ\MarkMeTest\Renderer;
 
+use MethorZ\MarkMe\Element\BlockQuote;
+use MethorZ\MarkMe\Element\NewLine;
 use MethorZ\MarkMe\Renderer\BlockQuoteRenderer;
 use MethorZ\MarkMe\Renderer\ImageRenderer;
+use MethorZ\MarkMe\Renderer\NewLineRenderer;
+use MethorZ\MarkMe\Renderer\ParagraphRenderer;
 use MethorZ\MarkMe\Renderer\TagRenderer;
 use MethorZ\MarkMe\Renderer\TextRenderer;
 use MethorZ\MarkMeTest\Assets\BlockQuoteTestProvider;
@@ -21,6 +25,7 @@ use PHPUnit\Framework\TestCase;
 class BlockQuoteRendererTest extends TestCase
 {
     private BlockQuoteRenderer $renderer;
+    private NewLineRenderer $newLineRenderer;
 
     /**
      * Test block quote rendering
@@ -33,7 +38,15 @@ class BlockQuoteRendererTest extends TestCase
         $html = '';
 
         foreach ($elements as $element) {
-            $html .= $this->renderer->render($element) . "\n";
+            if ($element instanceof NewLine) {
+                $html .= $this->newLineRenderer->render($element);
+
+                continue;
+            }
+
+            if ($element instanceof BlockQuote) {
+                $html .= $this->renderer->render($element);
+            }
         }
 
         self::assertSame($expectation, $html);
@@ -47,10 +60,14 @@ class BlockQuoteRendererTest extends TestCase
         parent::setUp();
 
         $this->renderer = new BlockQuoteRenderer(
-            new TextRenderer(
-                new ImageRenderer(),
-                new TagRenderer()
+            new ParagraphRenderer(
+                new TextRenderer(
+                    new ImageRenderer(),
+                    new TagRenderer()
+                )
             )
         );
+
+        $this->newLineRenderer = new NewLineRenderer();
     }
 }

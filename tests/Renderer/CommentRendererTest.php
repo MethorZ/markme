@@ -4,7 +4,10 @@ declare(strict_types = 1);
 
 namespace MethorZ\MarkMeTest\Renderer;
 
+use MethorZ\MarkMe\Element\Comment;
+use MethorZ\MarkMe\Element\NewLine;
 use MethorZ\MarkMe\Renderer\CommentRenderer;
+use MethorZ\MarkMe\Renderer\NewLineRenderer;
 use MethorZ\MarkMeTest\Assets\CommentTestProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -18,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 class CommentRendererTest extends TestCase
 {
     private CommentRenderer $renderer;
+    private NewLineRenderer $newLineRenderer;
 
     /**
      * Test comment rendering
@@ -30,7 +34,15 @@ class CommentRendererTest extends TestCase
         $html = '';
 
         foreach ($elements as $element) {
-            $html .= $this->renderer->render($element) . "\n";
+            if ($element instanceof NewLine) {
+                $html .= $this->newLineRenderer->render($element);
+
+                continue;
+            }
+
+            if ($element instanceof Comment) {
+                $html .= $this->renderer->render($element);
+            }
         }
 
         self::assertSame($expectation, $html);
@@ -44,5 +56,6 @@ class CommentRendererTest extends TestCase
         parent::setUp();
 
         $this->renderer = new CommentRenderer();
+        $this->newLineRenderer = new NewLineRenderer();
     }
 }

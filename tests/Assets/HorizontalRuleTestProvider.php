@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace MethorZ\MarkMeTest\Assets;
 
 use MethorZ\MarkMe\Element\HorizontalRule;
+use MethorZ\MarkMe\Element\NewLine;
 
 /**
  * Tests cases / expectations / elements provider for horizontal rules
@@ -31,10 +32,15 @@ class HorizontalRuleTestProvider
 
         return [
             $horizontalRule1,
+            new NewLine(),
             $horizontalRule2,
+            new NewLine(),
             $horizontalRule3,
+            new NewLine(),
             $horizontalRule4,
+            new NewLine(),
             $horizontalRule5,
+            new NewLine(),
             $horizontalRule6,
         ];
     }

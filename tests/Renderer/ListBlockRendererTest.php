@@ -4,9 +4,12 @@ declare(strict_types = 1);
 
 namespace MethorZ\MarkMeTest\Renderer;
 
+use MethorZ\MarkMe\Element\ListBlock;
+use MethorZ\MarkMe\Element\NewLine;
 use MethorZ\MarkMe\Renderer\ImageRenderer;
 use MethorZ\MarkMe\Renderer\ListBlockRenderer;
 use MethorZ\MarkMe\Renderer\ListItemRenderer;
+use MethorZ\MarkMe\Renderer\NewLineRenderer;
 use MethorZ\MarkMe\Renderer\TagRenderer;
 use MethorZ\MarkMe\Renderer\TextRenderer;
 use MethorZ\MarkMeTest\Assets\ListBlockTestProvider;
@@ -22,6 +25,7 @@ use PHPUnit\Framework\TestCase;
 class ListBlockRendererTest extends TestCase
 {
     private ListBlockRenderer $renderer;
+    private NewLineRenderer $newLineRenderer;
 
     /**
      * Test list block rendering
@@ -34,7 +38,15 @@ class ListBlockRendererTest extends TestCase
         $html = '';
 
         foreach ($elements as $element) {
-            $html .= $this->renderer->render($element) . "\n";
+            if ($element instanceof NewLine) {
+                $html .= $this->newLineRenderer->render($element);
+
+                continue;
+            }
+
+            if ($element instanceof ListBlock) {
+                $html .= $this->renderer->render($element);
+            }
         }
 
         self::assertSame($expectation, $html);
@@ -55,5 +67,7 @@ class ListBlockRendererTest extends TestCase
                 )
             )
         );
+
+        $this->newLineRenderer = new NewLineRenderer();
     }
 }

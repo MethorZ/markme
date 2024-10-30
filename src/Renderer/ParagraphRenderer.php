@@ -5,6 +5,8 @@ declare(strict_types = 1);
 namespace MethorZ\MarkMe\Renderer;
 
 use MethorZ\MarkMe\Element\ElementInterface;
+use MethorZ\MarkMe\Element\Indentation\IndentationAwareInterface;
+use MethorZ\MarkMe\Element\Indentation\IndentationAwareTrait;
 use MethorZ\MarkMe\Element\Inline\Text;
 
 /**
@@ -14,8 +16,10 @@ use MethorZ\MarkMe\Element\Inline\Text;
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */
-class ParagraphRenderer implements RendererInterface
+class ParagraphRenderer implements RendererInterface, IndentationAwareInterface
 {
+    use IndentationAwareTrait;
+
     private const string ELEMENT_HTML = '<p>{{ lines }}</p>';
 
     /**
@@ -39,11 +43,17 @@ class ParagraphRenderer implements RendererInterface
             if ($placeholder === 'lines') {
                 $lines = '';
 
+                $this->increaseIndentation();
+
                 foreach ($value as $line) {
                     if ($line instanceof Text) {
-                        $lines .= $this->textRenderer->render($line) . ' ';
+                        $lines .= empty($lines)
+                            ? $this->textRenderer->render($line)
+                            : PHP_EOL . $this->indent() . $this->textRenderer->render($line);
                     }
                 }
+
+                $this->decreaseIndentation();
 
                 $value = $lines;
             }
@@ -54,6 +64,6 @@ class ParagraphRenderer implements RendererInterface
             $html = str_replace('{{ ' . $placeholder . ' }}', (string)$value, $html);
         }
 
-        return $html;
+        return $html . PHP_EOL;
     }
 }

@@ -6,7 +6,9 @@ namespace MethorZ\MarkMe\Renderer;
 
 use MethorZ\MarkMe\Element\BlockQuote;
 use MethorZ\MarkMe\Element\ElementInterface;
-use MethorZ\MarkMe\Element\Inline\Text;
+use MethorZ\MarkMe\Element\Indentation\IndentationAwareInterface;
+use MethorZ\MarkMe\Element\Indentation\IndentationAwareTrait;
+use MethorZ\MarkMe\Element\Paragraph;
 
 /**
  * Default block quote renderer
@@ -15,68 +17,42 @@ use MethorZ\MarkMe\Element\Inline\Text;
  * @author Thorsten Merz <methorz@spammerz.de>
  * @copyright MethorZ
  */
-class BlockQuoteRenderer implements RendererInterface
+class BlockQuoteRenderer implements RendererInterface, IndentationAwareInterface
 {
-    private int $indentation = 0;
-    private int $indentationStep = 4;
+    use IndentationAwareTrait;
 
     /**
      * Constructor
      */
     public function __construct(
-        private readonly RendererInterface $textRenderer
+        private readonly ParagraphRenderer $paragraphRenderer
     ) {
     }
 
     /**
      * Renders the element
+     *
+     * @throws \MethorZ\MarkMe\Exception\RendererException
      */
     public function render(ElementInterface $element): string
     {
-        $blockQuote = '{{ identation }}<blockquote>{{ content }}' . PHP_EOL . '{{ identation }}</blockquote>';
+        $html = $this->indent() . '<blockquote>' . PHP_EOL;
 
-        $html = '';
+        $this->increaseIndentation();
 
         foreach ($element->extractComponents()['lines'] as $line) {
-            $this->increaseIndentation();
-
             if ($line instanceof BlockQuote) {
-                $html .= PHP_EOL . PHP_EOL . $this->render($line);
-            } elseif ($line instanceof Text) {
-                $html .= PHP_EOL . $this->addIndentation() . '<p>' . $this->textRenderer->render($line) . '</p>';
-            } else {
-                $html .= PHP_EOL . $this->addIndentation() . '<p>' . $line . '</p>';
+                $html .= $this->render($line);
+            } elseif ($line instanceof Paragraph) {
+                $this->paragraphRenderer->setIndentation($this->getIndentation());
+                $html .= $this->indent() . $this->paragraphRenderer->render($line);
             }
-
-            $this->decreaseIndentation();
         }
 
-        $html = str_replace('{{ content }}', $html, $blockQuote);
+        $this->decreaseIndentation();
 
-        return str_replace('{{ identation }}', $this->addIndentation(), $html);
-    }
+        $html .= $this->indent() . '</blockquote>';
 
-    /**
-     * Retrieves the indentation
-     */
-    protected function addIndentation(int $start = 0): string
-    {
-        return str_repeat(' ', $start + $this->indentation);
-    }
-
-    /**
-     * Increases the indentation
-     */
-    protected function increaseIndentation(): void
-    {
-        $this->indentation += $this->indentationStep;
-    }
-
-    /**
-     * Decreases the indentation
-     */
-    protected function decreaseIndentation(): void
-    {
-        $this->indentation -= $this->indentationStep;
+        return $html . PHP_EOL;
     }
 }

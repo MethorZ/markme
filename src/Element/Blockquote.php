@@ -10,7 +10,7 @@ use MethorZ\MarkMe\Element\Inline\Text;
 use MethorZ\MarkMe\Exception\ParseException;
 
 /**
- * Blockquote element
+ * BlockQuote element
  *
  * @package MethorZ\MarkMe\Element
  * @author Thorsten Merz <methorz@spammerz.de>
@@ -18,11 +18,11 @@ use MethorZ\MarkMe\Exception\ParseException;
  */
 class BlockQuote extends AbstractElement
 {
-    private const string REGEX = '/^>{1,}\s(.*)$/';
-    private const string VALID_MARKDOWN_REGEX = '/^>{1,}\s.*$/m';
+    private const string REGEX = '/^(>{1,})\s*(.*)$/';
+    private const string VALID_MARKDOWN_REGEX = '/^>{1,}(\s.*)?$/m';
 
     /**
-     * Supported element features
+     * Supported features
      *
      * @var array<string>
      */
@@ -34,22 +34,22 @@ class BlockQuote extends AbstractElement
     /**
      * Quote lines
      *
-     * @var array<\MethorZ\MarkMe\Element\Blockquote|\MethorZ\MarkMe\Element\Inline\Text>
+     * @var array<\MethorZ\MarkMe\Element\Blockquote|\MethorZ\MarkMe\Element\Paragraph>
      */
     private array $lines = [];
 
     /**
-     * Add quote lines whether it is a string or another nested BlockQuote
+     * Add a line to the blockquote
      */
-    public function addLine(Text|self $line): void
+    public function addLine(Paragraph|self $line): void
     {
         $this->lines[] = $line;
     }
 
     /**
-     * Returns the heading text
+     * Get the blockquote lines
      *
-     * @return array<string|\MethorZ\MarkMe\Element\Blockquote>
+     * @return array<\MethorZ\MarkMe\Element\Blockquote|\MethorZ\MarkMe\Element\Paragraph>
      */
     public function getLines(): array
     {
@@ -57,9 +57,9 @@ class BlockQuote extends AbstractElement
     }
 
     /**
-     * Extracts the components of the element
+     * Extract the components of the blockquote
      *
-     * @return array<string,string|int|bool|float|\MethorZ\MarkMe\Element\ElementInterface>
+     * @return array<string, array<\MethorZ\MarkMe\Element\Blockquote|\MethorZ\MarkMe\Element\Paragraph>>
      */
     public function extractComponents(): array
     {
@@ -69,63 +69,111 @@ class BlockQuote extends AbstractElement
     }
 
     /**
-     * Checks if the line matches the element and returns an instance of the element or false
-     *
-     * @throws \MethorZ\MarkMe\Exception\ParseException
+     * Try to create an instance of the element from a markdown string
      */
     public static function tryCreate(string $markdown): bool|self
     {
-        if (!preg_match(self::VALID_MARKDOWN_REGEX, $markdown)) {
+        if (empty($markdown)) {
+            return false;
+        }
 
-            if (!($markdown === '>')) {
-                return false;
-            }
+        if (preg_match('/^>+$/', $markdown)) {
+            return true;
+        }
+
+        if (!preg_match(self::VALID_MARKDOWN_REGEX, $markdown)) {
+            return false;
         }
 
         $lines = explode(PHP_EOL, $markdown);
-        $rootBlockQuote = new self();
+        $iterator = new ArrayIterator($lines);
 
-        self::parseLines(new ArrayIterator($lines), $rootBlockQuote, 1);
+        try {
+            $rootBlockQuote = new self();
+            self::parseLines($iterator, $rootBlockQuote);
 
-        return $rootBlockQuote;
+            return !empty($rootBlockQuote->getLines())
+                ? $rootBlockQuote
+                : false;
+        } catch (ParseException) { // phpcs:ignore
+            return false;
+        }
     }
 
     /**
-     *  Parse the lines and create the nested BlockQuote elements
-     *
-     * Manual Iterator handling for passing by reference across recursive loops
+     * Parse the lines and create the nested BlockQuote elements
      *
      * @throws \MethorZ\MarkMe\Exception\ParseException
      */
-    private static function parseLines(Iterator $lines, self $currentBlockQuote, int $level): void
+    private static function parseLines(Iterator $lines, self $rootBlockQuote): void
     {
-        do {
-            $line = $lines->current();
+        $blockQuoteStack = [1 => $rootBlockQuote];
+        $paragraphStack = [];
+        $previousLevel = 1;
 
-            // ToDo: Implementation of a new paragraph during rendering - skip for now
-            if ($line === '>') {
+        while ($lines->valid()) {
+            $line = trim($lines->current(), "\r\n");
+
+            // Skip empty lines or lines with just quote markers
+            if (empty($line) || self::isEmptyQuoteLine($line)) {
+                unset($paragraphStack[$previousLevel]);
                 $lines->next();
 
                 continue;
             }
 
-            if (preg_match(self::REGEX, $line, $matches)) {
-                $currentLevel = substr_count($line, '>');
-                $text = trim($matches[1]);
-
-                if ($currentLevel > $level) {
-                    $newBlockQuote = new self();
-                    $currentBlockQuote->addLine($newBlockQuote);
-                    self::parseLines($lines, $newBlockQuote, $currentLevel);
-                } elseif ($currentLevel < $level) {
-                    return;
-                } else {
-                    $currentBlockQuote->addLine(new Text($text));
-                    $lines->next();
-                }
-            } else {
-                throw new ParseException('Invalid blockquote line: ' . $line);
+            // Parse the line to extract quote level and content
+            if (!preg_match(self::REGEX, $line, $matches)) {
+                throw new ParseException("Invalid blockquote line: $line");
             }
-        } while ($lines->valid());
+
+            $currentLevel = strlen($matches[1]);
+            $content = $matches[2];
+
+            // Level transition handling
+            if ($currentLevel !== $previousLevel) {
+                // Clear paragraph context when changing levels
+                unset($paragraphStack[$previousLevel]);
+
+                // When going to a deeper level
+                if ($currentLevel > $previousLevel) {
+                    $newBlockQuote = new self();
+                    $blockQuoteStack[$previousLevel]->addLine($newBlockQuote);
+                    $blockQuoteStack[$currentLevel] = $newBlockQuote;
+
+                // When going to a shallower level
+                } else {
+                    // Clear any deeper levels from stacks
+                    foreach (array_keys($blockQuoteStack) as $level) {
+                        if ($level > $currentLevel) {
+                            unset($blockQuoteStack[$level], $paragraphStack[$level]);
+                        }
+                    }
+                }
+            }
+
+            // Handle content
+            if (!empty($content)) {
+                if (!isset($paragraphStack[$currentLevel])) {
+                    $paragraphStack[$currentLevel] = new Paragraph();
+                    $blockQuoteStack[$currentLevel]->addLine($paragraphStack[$currentLevel]);
+                }
+
+                $paragraphStack[$currentLevel]->addLine(new Text($content));
+            } else {
+                unset($paragraphStack[$currentLevel]);
+            }
+
+            $previousLevel = $currentLevel;
+            $lines->next();
+        }
+    }
+
+    /**
+     * Check if a line consists only of quote markers (potentially with whitespace)
+     */
+    private static function isEmptyQuoteLine(string $line): bool
+    {
+        return preg_match('/^>+\s*$/', $line) === 1;
     }
 }

@@ -7,6 +7,7 @@ namespace MethorZ\MarkMeTest\Assets;
 use MethorZ\MarkMe\Element\ListBlock;
 use MethorZ\MarkMe\Element\ListItem;
 use MethorZ\MarkMe\Element\Inline\Text;
+use MethorZ\MarkMe\Element\NewLine;
 
 /**
  * Tests cases / expectations / elements provider for list blocks
@@ -83,7 +84,9 @@ class ListBlockTestProvider
 
         return [
             $listBlock1,
+            new NewLine(),
             $listBlock2,
+            new NewLine(),
             $listBlock3,
         ];
     }

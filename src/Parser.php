@@ -12,6 +12,7 @@ use MethorZ\MarkMe\Element\ElementFeature;
 use MethorZ\MarkMe\Element\Heading;
 use MethorZ\MarkMe\Element\HorizontalRule;
 use MethorZ\MarkMe\Element\ListBlock;
+use MethorZ\MarkMe\Element\NewLine;
 use MethorZ\MarkMe\Element\Paragraph;
 use MethorZ\MarkMe\Element\Tracker;
 use MethorZ\MarkMe\Exception\ParseException;
@@ -99,7 +100,10 @@ class Parser
             // When the current element is the same as the current markdown line, append the line to the current element
             if (
                 $this->tracker->current() === $currentElementType
-                && $this->tracker->current()::supports(ElementFeature::SUPPORTS_MULTI_LINE)
+                && (
+                    $this->tracker->current()::supports(ElementFeature::SUPPORTS_MULTI_LINE)
+                    #|| $this->tracker->current()::supports(ElementFeature::SUPPORTS_NEW_LINE)
+                )
             ) {
                 $this->tracker->append($markdownLine);
 
@@ -114,12 +118,12 @@ class Parser
              */
             $this->processTrackedElement();
 
-            // Skip empty lines and dont track them
-            if ($currentElementType === Identifier::EMPTY_LINE) {
-                $this->tracker->reset();
-
-                continue;
-            }
+//            // Skip empty lines and dont track them
+//            if ($currentElementType === Identifier::NEW_LINE) {
+//                $this->tracker->reset();
+//
+//                continue;
+//            }
 
             $this->tracker->start($currentElementType);
             $this->tracker->append($markdownLine);
@@ -175,6 +179,7 @@ class Parser
 
         $element = match ($this->tracker->current()) {
             Identifier::FRONT_MATTER => FrontMatter::tryCreate($this->tracker->getMarkdown()),
+            Identifier::NEW_LINE => NewLine::tryCreate($this->tracker->getMarkdown()),
             Identifier::HEADING => Heading::tryCreate($this->tracker->getMarkdown()),
             Identifier::BLOCKQUOTE => BlockQuote::tryCreate($this->tracker->getMarkdown()),
             Identifier::LIST_BLOCK => ListBlock::tryCreate($this->tracker->getMarkdown()),

@@ -255,6 +255,6 @@ class IdentifierTest extends TestCase
      */
     public function testEmptyLineIdentification(): void
     {
-        self::assertEquals(Identifier::EMPTY_LINE, Identifier::identify(''));
+        self::assertEquals(Identifier::NEW_LINE, Identifier::identify(''));
     }
 }

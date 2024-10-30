@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace MethorZ\MarkMeTest\Assets;
 
+use MethorZ\MarkMe\Element\NewLine;
 use MethorZ\MarkMe\Element\Paragraph;
 use MethorZ\MarkMe\Element\Inline\Text;
 
@@ -48,7 +49,9 @@ class ParagraphTestProvider
 
         return [
             $paragraph1,
+            new NewLine(),
             $paragraph2,
+            new NewLine(),
             $paragraph3,
         ];
     }

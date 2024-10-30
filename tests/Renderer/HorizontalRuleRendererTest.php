@@ -4,7 +4,10 @@ declare(strict_types = 1);
 
 namespace MethorZ\MarkMeTest\Renderer;
 
+use MethorZ\MarkMe\Element\HorizontalRule;
+use MethorZ\MarkMe\Element\NewLine;
 use MethorZ\MarkMe\Renderer\HorizontalRuleRenderer;
+use MethorZ\MarkMe\Renderer\NewLineRenderer;
 use MethorZ\MarkMeTest\Assets\HorizontalRuleTestProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -18,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 class HorizontalRuleRendererTest extends TestCase
 {
     private HorizontalRuleRenderer $renderer;
+    private NewLineRenderer $newLineRenderer;
 
     /**
      * Test horizontal rule rendering
@@ -30,7 +34,13 @@ class HorizontalRuleRendererTest extends TestCase
         $html = '';
 
         foreach ($elements as $element) {
-            $html .= $this->renderer->render($element) . "\n";
+            if ($element instanceof NewLine) {
+                $html .= $this->newLineRenderer->render($element);
+            }
+
+            if ($element instanceof HorizontalRule) {
+                $html .= $this->renderer->render($element);
+            }
         }
 
         self::assertSame($expectation, $html);
@@ -44,5 +54,6 @@ class HorizontalRuleRendererTest extends TestCase
         parent::setUp();
 
         $this->renderer = new HorizontalRuleRenderer();
+        $this->newLineRenderer = new NewLineRenderer();
     }
 }

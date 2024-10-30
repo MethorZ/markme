@@ -4,7 +4,10 @@ declare(strict_types = 1);
 
 namespace MethorZ\MarkMeTest\Renderer;
 
+use MethorZ\MarkMe\Element\NewLine;
+use MethorZ\MarkMe\Element\Paragraph;
 use MethorZ\MarkMe\Renderer\ImageRenderer;
+use MethorZ\MarkMe\Renderer\NewLineRenderer;
 use MethorZ\MarkMe\Renderer\ParagraphRenderer;
 use MethorZ\MarkMe\Renderer\TagRenderer;
 use MethorZ\MarkMe\Renderer\TextRenderer;
@@ -21,6 +24,7 @@ use PHPUnit\Framework\TestCase;
 class ParagraphRendererTest extends TestCase
 {
     private ParagraphRenderer $renderer;
+    private NewLineRenderer $newLineRenderer;
 
     /**
      * Test the rendering of a paragraph
@@ -33,7 +37,15 @@ class ParagraphRendererTest extends TestCase
         $html = '';
 
         foreach ($elements as $element) {
-            $html .= $this->renderer->render($element) . "\n";
+            if ($element instanceof NewLine) {
+                $html .= $this->newLineRenderer->render($element);
+
+                continue;
+            }
+
+            if ($element instanceof Paragraph) {
+                $html .= $this->renderer->render($element);
+            }
         }
 
         self::assertSame($expectation, $html);
@@ -52,5 +64,7 @@ class ParagraphRendererTest extends TestCase
                 new TagRenderer()
             )
         );
+
+        $this->newLineRenderer = new NewLineRenderer();
     }
 }

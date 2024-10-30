@@ -7,6 +7,7 @@ namespace MethorZ\MarkMeTest\Assets;
 use MethorZ\MarkMe\Attribute\Attribute;
 use MethorZ\MarkMe\Element\Heading;
 use MethorZ\MarkMe\Element\Inline\Text;
+use MethorZ\MarkMe\Element\NewLine;
 
 /**
  * Tests cases / expectations / elements provider for headings
@@ -59,7 +60,9 @@ class HeadingTestProvider
         return [
             $heading1,
             $heading2,
+            new NewLine(),
             $heading3,
+            new NewLine(),
             $heading4,
             $heading5,
             $heading6,

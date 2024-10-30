@@ -76,7 +76,7 @@ class MarkdownTest extends TestCase
     public function testHtml(): void
     {
         $markdown = file_get_contents(__DIR__ . '/Assets/markdown.md');
-        $expectedHtml = file_get_contents(__DIR__ . '/Assets/markdown.html');
+        $expectedHtml = rtrim(file_get_contents(__DIR__ . '/Assets/markdown.html'), PHP_EOL);
 
         self::assertEquals($expectedHtml, $this->markdown->html($markdown));
     }

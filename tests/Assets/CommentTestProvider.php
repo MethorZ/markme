@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace MethorZ\MarkMeTest\Assets;
 
 use MethorZ\MarkMe\Element\Comment;
+use MethorZ\MarkMe\Element\NewLine;
 
 /**
  * Tests cases / expectations / elements provider for comments
@@ -45,9 +46,12 @@ class CommentTestProvider
          * -->
          */
         $comment1 = new Comment('This is a comment');
+        $comment2 = new Comment('This is another comment');
 
         return [
             $comment1,
+            new NewLine(),
+            $comment2,
         ];
     }
 }

@@ -109,7 +109,7 @@ class ParserTest extends TestCase
     public function testTagParser(): void
     {
         $expectations = TagTestProvider::getElements();
-        $markdown = file_get_contents(__DIR__ . '/Assets/tag.md');
+        $markdown = file_get_contents(__DIR__ . '/Assets/tag.md') . "\n";
 
         $elements = $this->parser->parse($markdown);
 

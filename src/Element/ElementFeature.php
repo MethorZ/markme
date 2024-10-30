@@ -15,4 +15,5 @@ enum ElementFeature: string
 {
     case SUPPORTS_NESTING = 'supportsNesting';
     case SUPPORTS_MULTI_LINE = 'supportsMultiLineContent';
+    case SUPPORTS_NEW_LINE = 'supportsNewLine';
 }

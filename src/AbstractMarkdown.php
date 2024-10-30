@@ -11,6 +11,8 @@ use MethorZ\MarkMe\Element\Heading;
 use MethorZ\MarkMe\Element\HorizontalRule;
 use MethorZ\MarkMe\Element\Inline\Text;
 use MethorZ\MarkMe\Element\ListBlock;
+use MethorZ\MarkMe\Element\ListItem;
+use MethorZ\MarkMe\Element\NewLine;
 use MethorZ\MarkMe\Element\Paragraph;
 use MethorZ\MarkMe\Exception\RendererException;
 use MethorZ\MarkMe\Renderer\BlockQuoteRenderer;
@@ -20,6 +22,7 @@ use MethorZ\MarkMe\Renderer\HorizontalRuleRenderer;
 use MethorZ\MarkMe\Renderer\ImageRenderer;
 use MethorZ\MarkMe\Renderer\ListBlockRenderer;
 use MethorZ\MarkMe\Renderer\ListItemRenderer;
+use MethorZ\MarkMe\Renderer\NewLineRenderer;
 use MethorZ\MarkMe\Renderer\ParagraphRenderer;
 use MethorZ\MarkMe\Renderer\RendererInterface;
 use MethorZ\MarkMe\Renderer\TagRenderer;
@@ -59,7 +62,8 @@ abstract class AbstractMarkdown
         Heading::class => HeadingRenderer::class,
         HorizontalRule::class => HorizontalRuleRenderer::class,
         ListBlock::class => ListBlockRenderer::class,
-        ListItemRenderer::class => ListItemRenderer::class,
+        ListItem::class => ListItemRenderer::class,
+        NewLine::class => NewLineRenderer::class,
         Paragraph::class => ParagraphRenderer::class,
         Tag::class => TagRenderer::class,
         Text::class => TextRenderer::class,
@@ -71,7 +75,7 @@ abstract class AbstractMarkdown
      * @var array<string,array<string>>
      */
     private array $rendererDependencies = [
-        BlockQuoteRenderer::class => [TextRenderer::class],
+        BlockQuoteRenderer::class => [ParagraphRenderer::class],
         ListBlockRenderer::class => [ListItemRenderer::class],
         ListItemRenderer::class => [TextRenderer::class],
         ParagraphRenderer::class => [TextRenderer::class],
