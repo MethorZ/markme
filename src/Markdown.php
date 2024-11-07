@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace MethorZ\MarkMe;
 
+use MethorZ\MarkMe\Metadata\FrontMatter;
+
 /**
  * Markdown handling
  *
@@ -14,18 +16,35 @@ namespace MethorZ\MarkMe;
 class Markdown extends AbstractMarkdown
 {
     /**
+     * Returns the front matter if it exists
+     */
+    public function frontMatter(): FrontMatter|false
+    {
+        foreach ($this->parsedElements as $element) {
+            if ($element instanceof FrontMatter) {
+                return $element;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Renders the markdown to html
      *
      * @throws \MethorZ\MarkMe\Exception\RendererException
-     * @throws \MethorZ\MarkMe\Exception\ParseException
-     * @throws \MethorZ\MarkMe\Exception\IdentificationException
      */
-    public function html(string $markdown): string
+    public function html(): string
     {
-        $this->parsedElements = $this->parser->parse($markdown);
         $html = '';
 
         foreach ($this->parsedElements as $element) {
+
+            // Front matter is not rendered
+            if ($element instanceof FrontMatter) {
+                continue;
+            }
+
             $html .= $this->getRenderer($element::class)->render($element);
         }
 

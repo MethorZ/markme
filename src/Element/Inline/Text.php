@@ -116,6 +116,14 @@ class Text extends AbstractElement
     }
 
     /**
+     * Checks if the text contains a tag
+     */
+    public function containsTag(): bool
+    {
+        return preg_match('/(#[a-zA-Z0-9]*[a-zA-Z][a-zA-Z0-9]*)(\{[^}]*\})?(?=\s|<br\s*\/?>|$)/', $this->text) === 1;
+    }
+
+    /**
      * Extracts the components of the element
      *
      * @return array<string,string|int|bool|float>

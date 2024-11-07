@@ -117,10 +117,6 @@ class Identifier
             return self::LIST_ITEM;
         }
 
-        if (Tag::tryCreate($markdownLine) !== false) {
-            return self::TAG;
-        }
-
         if (Paragraph::tryCreate($markdownLine)) {
             return self::PARAGRAPH;
         }

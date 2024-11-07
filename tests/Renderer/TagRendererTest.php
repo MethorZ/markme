@@ -4,10 +4,13 @@ declare(strict_types = 1);
 
 namespace MethorZ\MarkMeTest\Renderer;
 
-use MethorZ\MarkMe\Element\Custom\Tag;
 use MethorZ\MarkMe\Element\NewLine;
+use MethorZ\MarkMe\Element\Paragraph;
+use MethorZ\MarkMe\Renderer\ImageRenderer;
 use MethorZ\MarkMe\Renderer\NewLineRenderer;
+use MethorZ\MarkMe\Renderer\ParagraphRenderer;
 use MethorZ\MarkMe\Renderer\TagRenderer;
+use MethorZ\MarkMe\Renderer\TextRenderer;
 use MethorZ\MarkMeTest\Assets\TagTestProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -20,7 +23,7 @@ use PHPUnit\Framework\TestCase;
  */
 class TagRendererTest extends TestCase
 {
-    private TagRenderer $renderer;
+    private ParagraphRenderer $renderer;
     private NewLineRenderer $newLineRenderer;
 
     /**
@@ -28,7 +31,7 @@ class TagRendererTest extends TestCase
      */
     public function testRenderTag(): void
     {
-        $expectation = rtrim(file_get_contents(__DIR__ . '/../Assets/tag.html'), PHP_EOL);
+        $expectation = file_get_contents(__DIR__ . '/../Assets/tag.html');
         $elements = TagTestProvider::getElements();
 
         $html = '';
@@ -40,7 +43,7 @@ class TagRendererTest extends TestCase
                 continue;
             }
 
-            if ($element instanceof Tag) {
+            if ($element instanceof Paragraph) {
                 $html .= $this->renderer->render($element);
             }
         }
@@ -55,7 +58,7 @@ class TagRendererTest extends TestCase
     {
         parent::setUp();
 
-        $this->renderer = new TagRenderer();
+        $this->renderer = new ParagraphRenderer(new TextRenderer(new ImageRenderer(), new TagRenderer()));
         $this->newLineRenderer = new NewLineRenderer();
     }
 }

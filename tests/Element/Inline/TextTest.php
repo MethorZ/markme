@@ -409,4 +409,14 @@ class TextTest extends TestCase
 
         self::assertTrue($text->containsLink());
     }
+
+    /**
+     * Test if the text contains a tag
+     */
+    public function testContainsTag(): void
+    {
+        $text = new Text('This is a text with a tag #ThisIsATag in it');
+
+        self::assertTrue($text->containsTag());
+    }
 }

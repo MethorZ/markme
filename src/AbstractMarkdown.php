@@ -89,7 +89,7 @@ abstract class AbstractMarkdown
      * @throws \MethorZ\MarkMe\Exception\ParseException
      * @throws \MethorZ\MarkMe\Exception\IdentificationException
      */
-    abstract public function html(string $markdown): string;
+    abstract public function html(): string;
 
     /**
      * Constructor
@@ -97,6 +97,17 @@ abstract class AbstractMarkdown
     public function __construct(
         protected readonly Parser $parser
     ) {
+    }
+
+    /**
+     * Parses the markdown
+     *
+     * @throws \MethorZ\MarkMe\Exception\ParseException
+     * @throws \MethorZ\MarkMe\Exception\IdentificationException
+     */
+    public function parse(string $markdown): void
+    {
+        $this->parsedElements = $this->parser->parse($markdown);
     }
 
     /**

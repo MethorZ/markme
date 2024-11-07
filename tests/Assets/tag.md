@@ -17,3 +17,7 @@
 #TagWithAttribute5{data-attribute="my-attribute-value"}
 
 #TagWithMultipleAttributes{#tagId .tagClass style="color: red;" data-attribute=my-attribute-value}
+
+This is some text with a tag #ThisIsATag in between.
+
+This is some text with a tag with attributes #ThisIsATag{#tagId .tagClass style="color: red;" data-attribute=my-attribute-value} in between.

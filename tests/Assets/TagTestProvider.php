@@ -4,10 +4,9 @@ declare(strict_types = 1);
 
 namespace MethorZ\MarkMeTest\Assets;
 
-use MethorZ\MarkMe\Attribute\Attribute;
-use MethorZ\MarkMe\Element\Custom\Tag;
 use MethorZ\MarkMe\Element\Inline\Text;
 use MethorZ\MarkMe\Element\NewLine;
+use MethorZ\MarkMe\Element\Paragraph;
 
 /**
  * Tests cases / expectations / elements provider for tags
@@ -41,41 +40,51 @@ class TagTestProvider
          * #TagWithAttribute4{attribute=my-attribute-value}
          * #TagWithMultipleAttributes{#tagId .tagClass style="color: red;" attribute="my-attribute-value"}
          */
-        $idAttribute = new Attribute('#tagId');
-        $classAttribute = new Attribute('.tagClass');
-        $styleAttribute = new Attribute('style="color: red;"');
-        $dataAttribute = new Attribute('data-attribute=my-attribute-value');
-        $dataAttribute2 = new Attribute('data-attribute="my-attribute-value"');
 
-        $tagWithAttribute1 = new Tag(new Text('TagWithAttribute1'));
-        $tagWithAttribute1->addAttribute($idAttribute);
+        $tag1 = new Paragraph();
+        $tag1->addLine(new Text('#ThisIsATag'));
 
-        $tagWithAttribute2 = new Tag(new Text('TagWithAttribute2'));
-        $tagWithAttribute2->addAttribute($classAttribute);
+        $tag2 = new Paragraph();
+        $tag2->addLine(new Text('#TagWithNumberAtEnd1'));
 
-        $tagWithAttribute3 = new Tag(new Text('TagWithAttribute3'));
-        $tagWithAttribute3->addAttribute($styleAttribute);
+        $tag3 = new Paragraph();
+        $tag3->addLine(new Text('#TagWith1NumberIn'));
 
-        $tagWithAttribute4 = new Tag(new Text('TagWithAttribute4'));
-        $tagWithAttribute4->addAttribute($dataAttribute);
+        $tag4 = new Paragraph();
+        $tag4->addLine(new Text('#1TagWithNumberAtStart'));
 
-        $tagWithAttribute5 = new Tag(new Text('TagWithAttribute5'));
-        $tagWithAttribute5->addAttribute($dataAttribute2);
+        $tagWithAttribute1 = new Paragraph();
+        $tagWithAttribute1->addLine(new Text('#TagWithAttribute1{#tagId}'));
 
-        $tagWithMultipleAttributes = new Tag(new Text('TagWithMultipleAttributes'));
-        $tagWithMultipleAttributes->addAttribute($idAttribute);
-        $tagWithMultipleAttributes->addAttribute($classAttribute);
-        $tagWithMultipleAttributes->addAttribute($styleAttribute);
-        $tagWithMultipleAttributes->addAttribute($dataAttribute);
+        $tagWithAttribute2 = new Paragraph();
+        $tagWithAttribute2->addLine(new Text('#TagWithAttribute2{.tagClass}'));
+
+        $tagWithAttribute3 = new Paragraph();
+        $tagWithAttribute3->addLine(new Text('#TagWithAttribute3{style="color: red;"}'));
+
+        $tagWithAttribute4 = new Paragraph();
+        $tagWithAttribute4->addLine(new Text('#TagWithAttribute4{data-attribute=my-attribute-value}'));
+
+        $tagWithAttribute5 = new Paragraph();
+        $tagWithAttribute5->addLine(new Text('#TagWithAttribute5{data-attribute="my-attribute-value"}'));
+
+        $tagWithMultipleAttributes = new Paragraph();
+        $tagWithMultipleAttributes->addLine(new Text('#TagWithMultipleAttributes{#tagId .tagClass style="color: red;" data-attribute=my-attribute-value}'));
+
+        $tagWithText = new Paragraph();
+        $tagWithText->addLine(new Text('This is some text with a tag #ThisIsATag in between.'));
+
+        $tagWithTextAndAttributes = new Paragraph();
+        $tagWithTextAndAttributes->addLine(new Text('This is some text with a tag with attributes #ThisIsATag{#tagId .tagClass style="color: red;" data-attribute=my-attribute-value} in between.')); // phpcs:ignore
 
         return [
-            new Tag(new Text('ThisIsATag')),
+            $tag1,
             new NewLine(),
-            new Tag(new Text('TagWithNumberAtEnd1')),
+            $tag2,
             new NewLine(),
-            new Tag(new Text('TagWith1NumberIn')),
+            $tag3,
             new NewLine(),
-            new Tag(new Text('1TagWithNumberAtStart')),
+            $tag4,
             new NewLine(),
             $tagWithAttribute1,
             new NewLine(),
@@ -88,6 +97,10 @@ class TagTestProvider
             $tagWithAttribute5,
             new NewLine(),
             $tagWithMultipleAttributes,
+            new NewLine(),
+            $tagWithText,
+            new NewLine(),
+            $tagWithTextAndAttributes,
         ];
     }
 }

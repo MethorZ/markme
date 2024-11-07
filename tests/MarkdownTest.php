@@ -30,10 +30,11 @@ class MarkdownTest extends TestCase
     public function testSetRenderer(): void
     {
         $this->markdown->setRenderer(Paragraph::class, FakeRenderer::class, [FakeDependency::class]);
+        $this->markdown->parse('Some text');
 
         self::assertEquals(
             'Fake renderer triggered for ' . Paragraph::class . ' with dependency ' . FakeDependency::class,
-            $this->markdown->html('Some text')
+            $this->markdown->html()
         );
     }
 
@@ -76,9 +77,11 @@ class MarkdownTest extends TestCase
     public function testHtml(): void
     {
         $markdown = file_get_contents(__DIR__ . '/Assets/markdown.md');
-        $expectedHtml = rtrim(file_get_contents(__DIR__ . '/Assets/markdown.html'), PHP_EOL);
+        $expectedHtml = file_get_contents(__DIR__ . '/Assets/markdown.html');
 
-        self::assertEquals($expectedHtml, $this->markdown->html($markdown));
+        $this->markdown->parse($markdown);
+
+        self::assertEquals($expectedHtml, $this->markdown->html());
     }
 
     /**
